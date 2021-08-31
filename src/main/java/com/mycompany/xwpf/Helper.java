@@ -2,12 +2,11 @@ package com.mycompany.xwpf;
 
 import java.util.List;
 
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
+import org.apache.poi.xwpf.usermodel.UnderlinePatterns;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTPageMargins;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
 
 public class Helper {
 	public String getFullText(XWPFDocument xdoc) {
@@ -18,7 +17,7 @@ public class Helper {
 				
 				for (XWPFRun rn : paragraph.getRuns()) {
 					String text = rn.text();
-					//text = text.replaceAll("\t", "");
+					text = fixTabString(text);
 					str += text;
 				}
 				str += "\n";
@@ -33,14 +32,18 @@ public class Helper {
 		List<XWPFParagraph> paragraphList = xdoc.getParagraphs();
 		String xmlStr = "<elements resolver=\"hvl-default\" >\n";
 		int startOffset = 0;
+		boolean bold = false;
+		String fontFamily = "Times New Roman";
+		int align = 0;
 		for (XWPFParagraph paragraph : paragraphList) {
-			int align = 0;
-			if(paragraph.getAlignment().toString().equals("CENTER")) {
+			if(paragraph.getAlignment() == ParagraphAlignment.CENTER) {
 				align = 1;
-			}else if(paragraph.getAlignment().toString().equals("LEFT")) {
+			}else if(paragraph.getAlignment() == ParagraphAlignment.LEFT) {
 				align = 0;
+			}else if(paragraph.getAlignment() == ParagraphAlignment.RIGHT){
+				align = 2;
 			}else {
-				align = 1;
+				align = 0;
 			}
 			xmlStr += "<paragraph Alignment=\"" + align + "\">\n";
 //			System.out.println(paragraph.getText());
@@ -49,26 +52,29 @@ public class Helper {
 //
 //			System.out.println(paragraph.getNumFmt());
 //			System.out.println(paragraph.getAlignment());
-
 //			System.out.println(paragraph.isWordWrapped());
 			if(paragraph.getRuns().size() > 0) {
-				boolean bold = false;
+				
 				for (XWPFRun rn : paragraph.getRuns()) {
 //					System.out.println("bold------" + rn.isBold());
 //					System.out.println("bold------" + rn.getFontSize());
 //					System.out.println("bold------" + rn.getFontFamily());
 //					System.out.println("position---------" + rn.getTextPosition());
+					String underLine = "";
+					if(rn.getUnderline() != UnderlinePatterns.NONE) {
+						underLine = " underline = \"true\" ";
+					}
 					String text = rn.text();
-					//text = text.replaceAll("\t", "        ");
+					text = fixTabString(text);
 					bold = rn.isBold();
-					xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + rn.isBold() + "\" family=\"" + rn.getFontFamily() + "\" size=\"" + rn.getFontSize() + "\" foreground=\"-16777216\" startOffset=\"" + startOffset + "\" length=\"" + text.length() + "\" /> \n";
+					fontFamily = rn.getFontFamily();
+					xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + bold + "\" family=\"" + fontFamily + "\" " + underLine + " size=\"" + rn.getFontSize() + "\" foreground=\"-16777216\" startOffset=\"" + startOffset + "\" length=\"" + text.length() + "\" /> \n";
 					startOffset = startOffset + text.length();
-					//System.out.println(rn.text());
 				}
-				xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + bold + "\" family=\"Times New Roman\" size=\"12\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
+				xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + bold + "\" family=\"" + fontFamily + "\" size=\"12\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
 				startOffset += 1;
 			}else {
-				xmlStr += "<content Alignment=\"" + align + "\" bold=\"false\" family=\"Times New Roman\" size=\"12\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
+				xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + bold + "\" family=\""+ fontFamily +"\" size=\"12\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
 				startOffset += 1;
 			}
 			xmlStr += "</paragraph>\n";
@@ -82,7 +88,39 @@ public class Helper {
 		return numPages;
 	}
 	
-	public void makeXml(XWPFDocument xdoc) {
+	public int getTabCount(String str) {
+		int result = 0;
+		for(char c : str.toCharArray()) {
+			if("\t".equals("" + c)) {
+				result++;
+			}
+		}
+		return result;
+	}
+	
+	public String fixTabString(String str) {
+		String finalString = "";
+		if(getTabCount(str) > 2) {
+			int tabCount = 0;
+			for(char c : str.toCharArray()) {
+				if("\t".equals("" + c)) {
+					if(tabCount == 2) {
+						finalString += "";
+					}else {
+						finalString += String.valueOf(c);
+						tabCount++;
+					}
+				}else {
+					finalString += String.valueOf(c);
+				}
+			}
+		}else {
+			finalString = str;
+		}
+		return finalString;
+	}
+	
+	public String makeXml(XWPFDocument xdoc) {
 		String xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
 		xmlStr += "<template format_id=\"1.7\" >\n";
 		xmlStr += "<content><![CDATA[\n";
@@ -99,6 +137,6 @@ public class Helper {
 		xmlStr += "<style name=\"hvl-default\" family=\"Times New Roman\" size=\"12\" description=\"Gövde\" />\n";
 		xmlStr += "</styles>\n";
 		xmlStr += "</template>\n";
-		System.out.println(xmlStr);
+		return xmlStr;
 	}
 }
