@@ -52,7 +52,7 @@ public class Helper {
 
 //			System.out.println(paragraph.isWordWrapped());
 			if(paragraph.getRuns().size() > 0) {
-				
+				boolean bold = false;
 				for (XWPFRun rn : paragraph.getRuns()) {
 //					System.out.println("bold------" + rn.isBold());
 //					System.out.println("bold------" + rn.getFontSize());
@@ -60,14 +60,15 @@ public class Helper {
 //					System.out.println("position---------" + rn.getTextPosition());
 					String text = rn.text();
 					//text = text.replaceAll("\t", "        ");
+					bold = rn.isBold();
 					xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + rn.isBold() + "\" family=\"" + rn.getFontFamily() + "\" size=\"" + rn.getFontSize() + "\" foreground=\"-16777216\" startOffset=\"" + startOffset + "\" length=\"" + text.length() + "\" /> \n";
 					startOffset = startOffset + text.length();
 					//System.out.println(rn.text());
 				}
-				xmlStr += "<content Alignment=\"" + align + "\" bold=\"true\" family=\"Times New Roman\" size=\"12\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
+				xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + bold + "\" family=\"Times New Roman\" size=\"12\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
 				startOffset += 1;
 			}else {
-				xmlStr += "<content Alignment=\"" + align + "\" bold=\"true\" family=\"Times New Roman\" size=\"12\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
+				xmlStr += "<content Alignment=\"" + align + "\" bold=\"false\" family=\"Times New Roman\" size=\"12\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
 				startOffset += 1;
 			}
 			xmlStr += "</paragraph>\n";
