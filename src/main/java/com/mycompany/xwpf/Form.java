@@ -153,7 +153,7 @@ public class Form extends javax.swing.JFrame {
             	String xmlStr = helper.makeXml(xdoc);
                 jTextArea1.setText(xmlStr);
         	}catch(Exception e) {
-        		
+        		System.out.println(e.getMessage());
         	}
     	}
     }                                        
