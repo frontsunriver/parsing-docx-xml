@@ -28,22 +28,22 @@ public class Main {
 //        System.out.println(Helper.getTextFromDocument(djmDocument));
     	
 //    	String userDirectory = System.getProperty("user.dir");
-    	try {
-    		File f = new File("doysa.docx");
-            FileInputStream fis = new FileInputStream(f); 
-            XWPFDocument xdoc = new XWPFDocument(OPCPackage.open(fis));
-    	    Helper helper = new Helper();
-    	    String xmlStr = helper.makeXml(xdoc);
-    	    
-    	    FileWriter myWriter = new FileWriter("content.xml");
-            myWriter.write(xmlStr);
-            myWriter.close();
-    	} catch(Exception e) {
-    		
-    	}
+//    	try {
+//    		File f = new File("doysa.docx");
+//            FileInputStream fis = new FileInputStream(f); 
+//            XWPFDocument xdoc = new XWPFDocument(OPCPackage.open(fis));
+//    	    Helper helper = new Helper();
+//    	    String xmlStr = helper.makeXml(xdoc);
+//    	    
+//    	    FileWriter myWriter = new FileWriter("content.xml");
+//            myWriter.write(xmlStr);
+//            myWriter.close();
+//    	} catch(Exception e) {
+//    		
+//    	}
         
-//    	Form f = new Form();
-//    	f.show();
+    	Form f = new Form();
+    	f.show();
 //        LOGGER.log(Level.INFO, "The text is: " + );
 //        LOGGER.log(Level.INFO, "All bold words in the document: " + Helper.getBoldWords(djmDocument).toString());
     }

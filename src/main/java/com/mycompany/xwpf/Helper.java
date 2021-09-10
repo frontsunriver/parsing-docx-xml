@@ -28,6 +28,7 @@ public class Helper {
 						beforeString = text;
 					}
 				}
+				str += " ";
 				str += "\n";
 			}else {
 				str += "\n";
@@ -44,6 +45,7 @@ public class Helper {
 		String fontFamily = "Times New Roman";
 		int align = 0;
 		String beforeString = "";
+		int fontSize = 12;
 		for (XWPFParagraph paragraph : paragraphList) {
 			String firstLineIndent = "";
 			if(paragraph.getAlignment() == ParagraphAlignment.CENTER) {
@@ -66,8 +68,14 @@ public class Helper {
 					String text = rn.text();
 					text = fixTabString(checkCount(beforeString), text);
 					bold = rn.isBold();
+					if(text.equals(" ")) {
+						bold = false;
+					}
 					fontFamily = rn.getFontFamily();
-					int fontSize = rn.getFontSize();
+					if(fontFamily == null) {
+						fontFamily = "Times New Roman";
+					}
+					fontSize = rn.getFontSize();
 					if(fontSize == -1) {
 						fontSize = 11;
 					}
@@ -83,10 +91,12 @@ public class Helper {
 						beforeString = text;
 					}
 				}
-				xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + bold + "\" family=\"" + fontFamily + "\" size=\"12\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
+				xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + bold + "\" family=\"" + fontFamily + "\" size=\"" + fontSize + "\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
+				startOffset += 1;
+				xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + bold + "\" family=\"" + fontFamily + "\" size=\"" + fontSize + "\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
 				startOffset += 1;
 			}else {
-				xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + bold + "\" family=\""+ fontFamily +"\" size=\"12\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
+				xmlStr += "<content Alignment=\"" + align + "\" bold=\"" + bold + "\" family=\""+ fontFamily +"\" size=\"" + fontSize + "\" startOffset=\"" + startOffset + "\" length=\"1\" />\n";
 				startOffset += 1;
 			}
 			xmlStr += "</paragraph>\n";
